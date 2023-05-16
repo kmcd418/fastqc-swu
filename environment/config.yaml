@@ -1,0 +1,2 @@
+run:
+    instance_type: ml.m5.xlarge
