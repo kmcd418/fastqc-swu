@@ -19,14 +19,6 @@ dvc add data/
 dvc push
 
 ##################
-# SAVE ANALYSIS VERSION TO GITHUB REPO
-##################
-echo "===== SAVING ANALYSIS INTO GITHUB ====="
-git add .
-git commit -m ${ANALYSIS_VERSION}
-git push
-
-##################
 # LAUNCH CODEBUILD PROJECT
 ##################
 # aws codebuild start-build --project-name reproducible-run
@@ -64,3 +56,16 @@ python .reproducible_run/job.py \
     --entrypoint code/entrypoint.sh
 
 echo "===== ANALYSIS EXECUTED SUCCESSFULLY ====="
+
+##################
+# SAVE ANALYSIS VERSION TO GITHUB REPO
+##################
+echo "===== SAVING ANALYSIS INTO GITHUB ====="
+git add .
+git commit -m ${ANALYSIS_VERSION}
+git push
+
+##################
+# SYNC RESULTS BACK TO SAGEMAKER
+##################
+dvc pull
