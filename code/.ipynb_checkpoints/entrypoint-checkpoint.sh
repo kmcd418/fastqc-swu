@@ -10,7 +10,8 @@ pip install -r requirements.txt
 ##################
 # LAUNCH CONTAINER JOB
 ##################
-python code/main.py
+# python code/main.py
+./code/FastQC/fastqc data/*.fastq -o results/
 
 ##################
 # ADD RESULTS TO S3
