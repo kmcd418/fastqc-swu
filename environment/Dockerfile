@@ -5,7 +5,9 @@ ENV PYTHONUNBUFFERED=TRUE
 # install gcc
 RUN apt-get update \
     && apt-get install -y gcc git \
-    && apt-get clean
+    && apt-get clean \
+    && apt-get install -y default-jre
+    
 
 # install python dependencies
 RUN pip install --no-cache --upgrade \
