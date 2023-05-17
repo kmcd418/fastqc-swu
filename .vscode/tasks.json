@@ -1,0 +1,15 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run",
+            "type": "shell",
+            "command": "sh .reproducible_run/run.sh"
+        },
+        {
+            "label": "Reproduce",
+            "type": "shell",
+            "command": "echo Here is a reproducible run"
+        }
+    ]
+}
