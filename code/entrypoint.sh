@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
-# This is the master script for the capsule. When you click "Reproducible Run", the code in this file will execute.
+
+# This is the master script for the SWU. 
+# When you click "Reproducible Run" or "Reproduce", the code in this file will execute.
 
 ##################
 # PREREQUISITES
 ##################
 dvc pull
-pip install -r requirements.txt
+
+# delete results from previous run
+rm -r results/*
 
 ##################
 # LAUNCH CONTAINER JOB
@@ -14,8 +18,12 @@ pip install -r requirements.txt
 ./code/FastQC/fastqc data/*.fastq -o results/
 
 ##################
-# ADD RESULTS TO S3
+# ADD RESULTS DATA VERSION TO S3
 ##################
 dvc add results/
 dvc push
 
+##################
+# ADD RESULTS DVC REFERENCE TO S3
+##################
+aws s3 cp ./results.dvc ${S3_OUTPUT}

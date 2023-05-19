@@ -55,6 +55,7 @@ if __name__ == "__main__":
     parser.add_argument("--job_name", type=str, default="")
     parser.add_argument("--container_image", type=str, default="")
     parser.add_argument("--entrypoint", type=str, default="")
+    parser.add_argument("--output_path", type=str, default="")
     args, _ = parser.parse_known_args()
 
     # IAM ROLE
@@ -71,6 +72,9 @@ if __name__ == "__main__":
         source_dir=".",
         instance_count=1,
         instance_type=config["run"]["instance_type"],
+        environment={"S3_OUTPUT": f"{args.output_path}/{args.job_name}/"},
+        # instance_type="local",
         disable_profiler=True,
+        output_path=args.output_path
     )
     estimator.fit(job_name=args.job_name)

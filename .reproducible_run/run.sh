@@ -1,6 +1,26 @@
 #!/usr/bin/env bash
 
 ##################
+# ENABLE ERROR HANDLING
+##################
+set -e
+
+on_error() {
+  echo "===== AN ERROR OCCURRED ====="
+  exit 1
+}
+
+##################
+# CHECK IF RUN SHOULD BE REPRODUCIBLE
+##################
+if [ "$1" = "reproducible" ]; then
+    echo "===== RUN REPRODUCIBLE ANALYSIS ====="
+else
+    echo "===== REPRODUCE ANALYSIS ====="
+fi
+
+
+##################
 # GET ANALYSIS NAME AND GENERATE ANALYSIS VERSION
 ##################
 # Read the YAML file
@@ -11,6 +31,7 @@ ANALYSIS_VERSION=$(uuidgen | cut -c-8)
 AWS_ACCOUNT=$(aws sts get-caller-identity --query Account --output text)
 AWS_REGION=$(aws configure get region)
 ANALYSIS_BUCKET="s3://sagemaker-${AWS_REGION}-${AWS_ACCOUNT}"
+
 
 #################
 # VERSIONING DATASET
@@ -53,19 +74,29 @@ echo "===== RUNNING THE ANALYSIS ON AWS ====="
 python .reproducible_run/job.py \
     --job_name ${ANALYSIS_NAME}-${ANALYSIS_VERSION} \
     --container_image ${CONTAINER_FULLNAME} \
-    --entrypoint code/entrypoint.sh
+    --entrypoint code/entrypoint.sh \
+    --output_path ${ANALYSIS_BUCKET}/runs
 
 echo "===== ANALYSIS EXECUTED SUCCESSFULLY ====="
 
 ##################
-# SAVE ANALYSIS VERSION TO GITHUB REPO
+# DOWNLOAD RESULTS FROM ANALYSIS JOB
 ##################
-echo "===== SAVING ANALYSIS INTO GITHUB ====="
-git add .
-git commit -m ${ANALYSIS_VERSION}
-git push
+echo "===== DOWNLOADING RESULTS ====="
+aws s3 cp ${ANALYSIS_BUCKET}/runs/${ANALYSIS_NAME}-${ANALYSIS_VERSION}/results.dvc .
+rm -r results/*
+dvc pull
+sleep 3
 
 ##################
-# SYNC RESULTS BACK TO SAGEMAKER
+# SAVE ANALYSIS VERSION TO GITHUB REPO
 ##################
-dvc pull
+if [ "$1" = "reproducible" ]; then
+    echo "===== SAVING ANALYSIS INTO GITHUB ====="
+    git add .
+    git commit -m ${ANALYSIS_VERSION}
+    git push
+    # sleep 2
+fi
+
+echo "===== RUN COMPLETE ====="

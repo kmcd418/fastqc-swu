@@ -9,7 +9,7 @@
         {
             "label": "Reproduce",
             "type": "shell",
-            "command": "echo Here is a reproducible run"
+            "command": "sh .reproducible_run/run.sh"
         }
     ]
 }
